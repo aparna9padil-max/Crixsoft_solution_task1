@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard | Movie Analytics</title>
+
+    <!-- Bootstrap -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+        rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link
+        rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Custom CSS -->
+    <link
+        rel="stylesheet"
+        href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+<body class="dashboard-body">
+
+
+<!-- ================= NAVBAR ================= -->
+
+<nav class="navbar navbar-expand-lg navbar-dark movie-navbar">
+
+    <div class="container">
+
+        <a class="navbar-brand fw-bold" href="/">
+
+            <i class="bi bi-film"></i>
+
+            Movie<span>Analytics</span>
+
+        </a>
+
+
+        <button
+            class="navbar-toggler"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav">
+
+            <span class="navbar-toggler-icon"></span>
+
+        </button>
+
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+
+            <ul class="navbar-nav ms-auto">
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/">
+                        Home
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link active" href="/dashboard">
+                        Dashboard
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/movies">
+                        Movies
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/top-movies">
+                        Top Movies
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/genres">
+                        Genres
+                    </a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="/about">
+                        About
+                    </a>
+                </li>
+
+            </ul>
+
+        </div>
+
+    </div>
+
+</nav>
+
+
+
+<!-- ================= DASHBOARD HEADER ================= -->
+
+<section class="dashboard-header">
+
+    <div class="container">
+
+        <div class="row align-items-center">
+
+            <div class="col-md-8">
+
+                <span class="dashboard-label">
+                    <i class="bi bi-bar-chart-fill"></i>
+                    DATA ANALYTICS
+                </span>
+
+                <h1>
+                    Movie Ratings Dashboard
+                </h1>
+
+                <p>
+                    Explore statistics, rating distributions,
+                    top-rated movies and genre performance.
+                </p>
+
+            </div>
+
+            <div class="col-md-4 text-md-end">
+
+                <i class="bi bi-graph-up-arrow dashboard-big-icon"></i>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= STAT CARDS ================= -->
+
+<section class="dashboard-section">
+
+    <div class="container">
+
+        <div class="row g-4">
+
+
+            <!-- Total Movies -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon">
+                        <i class="bi bi-film"></i>
+                    </div>
+
+                    <p>Total Movies</p>
+
+                    <h2>{{ total_movies }}</h2>
+
+                    <small>
+                        Movies analyzed
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- Mean -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon">
+                        <i class="bi bi-star-fill"></i>
+                    </div>
+
+                    <p>Average Rating</p>
+
+                    <h2>{{ mean_rating }}</h2>
+
+                    <small>
+                        Mean rating
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- Median -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon">
+                        <i class="bi bi-bar-chart"></i>
+                    </div>
+
+                    <p>Median Rating</p>
+
+                    <h2>{{ median_rating }}</h2>
+
+                    <small>
+                        Middle value
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <!-- Highest -->
+
+            <div class="col-lg-3 col-md-6">
+
+                <div class="dashboard-card">
+
+                    <div class="card-icon">
+                        <i class="bi bi-trophy-fill"></i>
+                    </div>
+
+                    <p>Highest Rating</p>
+
+                    <h2>{{ highest_rating }}</h2>
+
+                    <small>
+                        Best rating
+                    </small>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= CHARTS ================= -->
+
+        <div class="row g-4 mt-2">
+
+
+            <!-- Rating Distribution -->
+
+            <div class="col-lg-6">
+
+                <div class="chart-card">
+
+                    <div class="chart-heading">
+
+                        <div>
+
+                            <h4>
+                                Rating Distribution
+                            </h4>
+
+                            <p>
+                                Number of movies by rating
+                            </p>
+
+                        </div>
+
+                        <i class="bi bi-bar-chart-line"></i>
+
+                    </div>
+
+                    <canvas id="ratingChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+            <!-- Top Movies -->
+
+            <div class="col-lg-6">
+
+                <div class="chart-card">
+
+                    <div class="chart-heading">
+
+                        <div>
+
+                            <h4>
+                                Top 10 Movies
+                            </h4>
+
+                            <p>
+                                Highest-rated movies
+                            </p>
+
+                        </div>
+
+                        <i class="bi bi-trophy"></i>
+
+                    </div>
+
+                    <canvas id="movieChart"></canvas>
+
+                </div>
+
+            </div>
+
+
+        </div>
+
+
+
+        <!-- ================= GENRE CHART ================= -->
+
+        <div class="row g-4 mt-2">
+
+            <div class="col-12">
+
+                <div class="chart-card">
+
+                    <div class="chart-heading">
+
+                        <div>
+
+                            <h4>
+                                Top-Rated Genres
+                            </h4>
+
+                            <p>
+                                Average rating by genre
+                            </p>
+
+                        </div>
+
+                        <i class="bi bi-collection-play"></i>
+
+                    </div>
+
+                    <canvas id="genreChart"></canvas>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- ================= TOP MOVIE ================= -->
+
+        <div class="top-movie-highlight mt-4">
+
+            <div>
+
+                <span>
+                    <i class="bi bi-trophy-fill"></i>
+                    HIGHEST-RATED MOVIE
+                </span>
+
+                <h3>
+                    {{ top_movie }}
+                </h3>
+
+            </div>
+
+            <a href="/top-movies"
+               class="btn btn-warning">
+
+                View Top Movies
+
+                <i class="bi bi-arrow-right"></i>
+
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+    <div class="container text-center">
+
+        <p>
+            <i class="bi bi-film"></i>
+            Movie Ratings Analytics
+        </p>
+
+        <small>
+            Python • Flask • Pandas • Bootstrap • Chart.js
+        </small>
+
+    </div>
+
+</footer>
+
+
+
+<!-- ================= JAVASCRIPT ================= -->
+
+<script>
+
+    // Rating Distribution
+
+    const ratingLabels =
+        {{ rating_labels | tojson }};
+
+    const ratingValues =
+        {{ rating_values | tojson }};
+
+
+    new Chart(
+        document.getElementById("ratingChart"),
+        {
+            type: "bar",
+
+            data: {
+
+                labels: ratingLabels,
+
+                datasets: [{
+                    label: "Number of Movies",
+
+                    data: ratingValues,
+
+                    borderWidth: 1
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+                        beginAtZero: true
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+
+    // Top Movies
+
+    const movieTitles =
+        {{ movie_titles | tojson }};
+
+    const movieRatings =
+        {{ movie_ratings | tojson }};
+
+
+    new Chart(
+        document.getElementById("movieChart"),
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: movieTitles,
+
+                datasets: [{
+
+                    label: "Rating",
+
+                    data: movieRatings,
+
+                    borderWidth: 1
+
+                }]
+
+            },
+
+            options: {
+
+                indexAxis: "y",
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    x: {
+                        beginAtZero: true,
+                        max: 10
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+
+
+    // Genre Chart
+
+    const genreLabels =
+        {{ genre_labels | tojson }};
+
+    const genreValues =
+        {{ genre_values | tojson }};
+
+
+    new Chart(
+        document.getElementById("genreChart"),
+        {
+
+            type: "bar",
+
+            data: {
+
+                labels: genreLabels,
+
+                datasets: [{
+
+                    label: "Average Rating",
+
+                    data: genreValues,
+
+                    borderWidth: 1
+
+                }]
+
+            },
+
+            options: {
+
+                responsive: true,
+
+                plugins: {
+
+                    legend: {
+                        display: false
+                    }
+
+                },
+
+                scales: {
+
+                    y: {
+                        beginAtZero: false,
+                        min: 7
+                    }
+
+                }
+
+            }
+
+        }
+    );
+
+</script>
+
+
+<script
+    src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+</script>
+
+
+</body>
+
+</html>
